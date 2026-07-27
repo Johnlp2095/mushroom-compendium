@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍄 The Mushroom Compendium — Botanical Art & Species Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #1a1410;
+    --bg-card: #241e18;
+    --bg-hover: #2d2620;
+    --text: #e8ddd0;
+    --text-muted: #9a8d7c;
+    --accent: #c4945a;
+    --accent-light: #e0b87a;
+    --green: #6b8f5e;
+    --red: #b55a4a;
+    --purple: #8769ae;
+    --orange: #c47a3a;
+    --border: #3a3228;
+    --gold: #b8964a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .hero {
+    background: linear-gradient(180deg, #0d0a08 0%, #1a1410 100%);
+    padding: 60px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(196,148,90,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-icon { font-size: 64px; margin-bottom: 12px; display: block; }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    color: var(--accent-light);
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-style: italic;
+    position: relative;
+  }
+  .hero .count {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 6px 18px;
+    background: rgba(196,148,90,0.1);
+    border: 1px solid rgba(196,148,90,0.2);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--accent);
+    position: relative;
+  }
+
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(26,20,16,0.95);
+    backdrop-filter: blur(12px);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .search-wrapper {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+  .search-wrapper .icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .search-wrapper input {
+    width: 100%;
+    padding: 10px 14px 10px 42px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .search-wrapper input:focus {
+    border-color: var(--accent);
+  }
+  .search-wrapper input::placeholder { color: var(--text-muted); }
+
+  .filter-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .filter-btn.active {
+    background: rgba(196,148,90,0.15);
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+
+  .grid-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: default;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(196,148,90,0.3);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    background: var(--bg-hover);
+  }
+
+  .card-img-wrapper {
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background: #0d0a08;
+    position: relative;
+  }
+  .card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .card:hover .card-img-wrapper img {
+    transform: scale(1.05);
+  }
+  .card-img-wrapper .attribution {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-align: right;
+  }
+  .card-img-wrapper .attribution a {
+    color: rgba(255,255,255,0.6);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .card-img-wrapper .attribution a:hover {
+    color: var(--accent-light);
+  }
+  .card-img-wrapper .img-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-size: 13px;
+    background: linear-gradient(135deg, #0d0a08 0%, #1a1410 100%);
+  }
+  .card-img-wrapper .img-loading::after {
+    content: '🍄';
+    font-size: 40px;
+    opacity: 0.3;
+  }
+
+  .card-body {
+    padding: 16px 18px 18px;
+  }
+  .card-sci-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent-light);
+    margin-bottom: 3px;
+  }
+  .card-common-name {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .card-family {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.04);
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .card-edibility {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .edibility-edible { background: rgba(107,143,94,0.15); color: var(--green); }
+  .edibility-choice { background: rgba(196,148,90,0.15); color: var(--accent-light); }
+  .edibility-good { background: rgba(107,143,94,0.12); color: #8ab87a; }
+  .edibility-poisonous { background: rgba(181,90,74,0.15); color: var(--red); }
+  .edibility-deadly { background: rgba(181,40,30,0.2); color: #e06050; }
+  .edibility-psychoactive { background: rgba(135,105,174,0.15); color: var(--purple); }
+  .edibility-medicinal { background: rgba(196,148,90,0.1); color: var(--gold); }
+  .edibility-inedible { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+  .edibility-toxic { background: rgba(196,122,58,0.15); color: var(--orange); }
+  .edibility-luxury { background: rgba(184,150,74,0.15); color: var(--gold); }
+
+  .no-results {
+    display: none;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-muted);
+  }
+  .no-results.show { display: block; }
+  .no-results .emoji { font-size: 48px; margin-bottom: 16px; display: block; }
+  .no-results p { font-size: 16px; }
+
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .controls { padding: 12px 16px; }
+    .grid-container { padding: 12px; }
+    .card-img-wrapper { height: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="hero-icon">🍄</span>
+  <h1>The Mushroom Compendium</h1>
+  <p class="subtitle">A Botanical Art &amp; Species Guide — <em>Inspired by "Mushroom Botanical Art"</em></p>
+  <span class="count" id="speciesCount">Loading species...</span>
+</header>
+
+<div class="controls">
+  <div class="search-wrapper">
+    <span class="icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search by name, family, or description..." oninput="filterCards()">
+  </div>
+  <div class="filter-btns">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" data-filter="edible" onclick="setFilter('edible')">🍽️ Edible</button>
+    <button class="filter-btn" data-filter="choice" onclick="setFilter('choice')">⭐ Choice</button>
+    <button class="filter-btn" data-filter="poisonous" onclick="setFilter('poisonous')">☠️ Poisonous</button>
+    <button class="filter-btn" data-filter="medicinal" onclick="setFilter('medicinal')">🌿 Medicinal</button>
+  </div>
+</div>
+
+<div class="grid-container">
+  <div class="grid" id="mushroomGrid"></div>
+  <div class="no-results" id="noResults">
+    <span class="emoji">🔍</span>
+    <p>No mushrooms found matching your search.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>
+    🍄 <em>The Mushroom Compendium</em> &middot; A botanical art &amp; species reference guide<br>
+    Inspired by the book <em>"Mushroom Botanical Art"</em><br>
+    Images sourced from <a href="https://en.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a> &amp; <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> — view each image's source page for attribution.<br>
+    Click any image to visit the Wikipedia article and view the original source.
+  </p>
+</footer>
+
+<script>
+// ===== MUSHROOM DATABASE =====
+const mushrooms = [
+  // --- AGARICUS ---
+  {sci:"Agaricus bisporus", com:"Common Mushroom / Button Mushroom", fam:"Agaricaceae", desc:"The most cultivated mushroom worldwide. Pale white to brown cap, short stem.", edi:"Edible &mdash; Popular", ediClass:"edible"},
+  {sci:"Agaricus campestris", com:"Field Mushroom / Meadow Mushroom", fam:"Agaricaceae", desc:"Common wild edible with a pale cap and pink gills. Grows in grassy meadows.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Agaricus arvensis", com:"Horse Mushroom", fam:"Agaricaceae", desc:"Large white mushroom with a distinct aniseed scent. Double ring on stem.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Agaricus xanthodermus", com:"Yellow Staining Mushroom", fam:"Agaricaceae", desc:"Stains bright yellow when bruised, especially at the stem base. Unpleasant smell.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Agaricus augustus", com:"The Prince", fam:"Agaricaceae", desc:"A large, handsome mushroom with a scaly brown cap and strong almond scent.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+
+  // --- AMANITA ---
+  {sci:"Amanita muscaria", com:"Fly Agaric", fam:"Amanitaceae", desc:"Iconic red cap with white spots. The classic fairy-tale toadstool.", edi:"Psychoactive / Poisonous", ediClass:"psychoactive"},
+  {sci:"Amanita phalloides", com:"Death Cap", fam:"Amanitaceae", desc:"Deadly poisonous — responsible for the majority of fatal mushroom poisonings.", edi:"Deadly Poisonous", ediClass:"deadly"},
+  {sci:"Amanita virosa", com:"Destroying Angel", fam:"Amanitaceae", desc:"Pure white and deadly. One of the most toxic mushrooms known.", edi:"Deadly Poisonous", ediClass:"deadly"},
+  {sci:"Amanita caesarea", com:"Caesar's Mushroom", fam:"Amanitaceae", desc:"Beautiful orange cap and yellow gills. Prized since Roman imperial times.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Amanita rubescens", com:"The Blusher", fam:"Amanitaceae", desc:"Pinkish-brown cap that bruises a wine-red colour when damaged.", edi:"Edible (cooked only)", ediClass:"edible"},
+  {sci:"Amanita pantherina", com:"Panther Cap", fam:"Amanitaceae", desc:"Brown cap with white warts. Similar to A. muscaria but more toxic.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Amanita citrina", com:"False Death Cap", fam:"Amanitaceae", desc:"Pale greenish-yellow cap with a large bulbous base. Radish-like smell.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Amanita fulva", com:"Tawny Grisette", fam:"Amanitaceae", desc:"Elegant tawny-brown cap with a striate margin. No ring on the stem.", edi:"Edible (cooked)", ediClass:"edible"},
+
+  // --- BOLETUS ---
+  {sci:"Boletus edulis", com:"Porcini / Cep / King Bolete", fam:"Boletaceae", desc:"Highly prized edible. Thick stem, brown cap, white pores. The king of boletes.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Boletus reticulatus", com:"Summer Bolete", fam:"Boletaceae", desc:"Similar to B. edulis but fruits in early summer. Reticulated stem.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Boletus pinophilus", com:"Pine Bolete", fam:"Boletaceae", desc:"Dark red-brown cap with white pores. Associated with pine trees.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Boletus satanas", com:"Satan's Bolete", fam:"Boletaceae", desc:"Pale cap, blood-red pores, and a thick bulbous stem. Avoid — severely toxic.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Imleria badia", com:"Bay Bolete", fam:"Boletaceae", desc:"Bay-brown cap with yellow pores that bruise blue. A reliable edible.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Boletus erythropus", com:"Red-footed Bolete", fam:"Boletaceae", desc:"Dark brown cap, red pores that bruise deeply blue-black.", edi:"Edible (cooked)", ediClass:"edible"},
+  {sci:"Boletus luridus", com:"Lurid Bolete", fam:"Boletaceae", desc:"Olive-brown cap, orange-red pores, and blue-staining flesh.", edi:"Edible (cooked)", ediClass:"edible"},
+
+  // --- CANTHARELLUS ---
+  {sci:"Cantharellus cibarius", com:"Golden Chanterelle", fam:"Cantharellaceae", desc:"Golden-yellow, funnel-shaped, with a fruity apricot scent. A gourmet treasure.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Cantharellus tubaeformis", com:"Yellowfoot / Trumpet Chanterelle", fam:"Cantharellaceae", desc:"Hollow stem with a dark brown cap. Late season fruiting.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Craterellus cornucopioides", com:"Black Trumpet / Horn of Plenty", fam:"Cantharellaceae", desc:"Dark grey-black trumpet shape. Delicate, rich flavour when dried.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+
+  // --- MORCHELLA ---
+  {sci:"Morchella esculenta", com:"Common Morel", fam:"Morchellaceae", desc:"Honeycomb-like cap of yellow-brown pits and ridges. A spring-time delicacy.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Morchella elata", com:"Black Morel", fam:"Morchellaceae", desc:"Dark brown to black honeycomb cap. One of the most prized edible mushrooms.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Morchella semilibera", com:"Half-free Morel", fam:"Morchellaceae", desc:"Cap hangs half-free from the stem. A more delicate morel species.", edi:"Edible &mdash; Good", ediClass:"good"},
+
+  // --- LACTARIUS ---
+  {sci:"Lactarius deliciosus", com:"Saffron Milk Cap", fam:"Russulaceae", desc:"Orange cap with concentric zones. Exudes carrot-coloured latex when cut.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Lactarius indigo", com:"Indigo Milk Cap", fam:"Russulaceae", desc:"Stunning blue mushroom with indigo latex. One of the most beautiful fungi.", edi:"Edible", ediClass:"edible"},
+  {sci:"Lactarius torminosus", com:"Woolly Milk Cap", fam:"Russulaceae", desc:"Pinkish cap with a shaggy, inrolled margin. Acrid white latex.", edi:"Poisonous (raw)", ediClass:"poisonous"},
+  {sci:"Lactarius turpis", com:"Ugly Milk Cap", fam:"Russulaceae", desc:"Dark olive-brown cap, sticky when wet. Bitter, acrid taste.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Lactarius volemus", com:"Fishy Milk Cap", fam:"Russulaceae", desc:"Orange-brown with abundant white latex. Smells fishy when old.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Lactarius chrysorrheus", com:"Yellow-drop Milk Cap", fam:"Russulaceae", desc:"Latex turns bright yellow on exposure. Grows with oaks.", edi:"Poisonous", ediClass:"poisonous"},
+
+  // --- RUSSULA ---
+  {sci:"Russula emetica", com:"The Sickener", fam:"Russulaceae", desc:"Bright red cap with white gills. Extremely acrid — living up to its name.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Russula cyanoxantha", com:"Charcoal Burner", fam:"Russulaceae", desc:"Variable violet-green cap with mild, nutty-tasting flesh. A safe russula.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Russula vesca", com:"Bare-toothed Russula", fam:"Russulaceae", desc:"Flesh-coloured cap with a mild, nutty flavour. A common find in summer woods.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Russula ochroleuca", com:"Ochre Brittlegill", fam:"Russulaceae", desc:"Yellow-ochre cap with a sharp, acrid taste. Common under birch and pine.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Russula nigricans", com:"Blackening Brittlegill", fam:"Russulaceae", desc:"Flesh reddens then slowly blackens when cut. Firm texture.", edi:"Edible (cooked)", ediClass:"edible"},
+  {sci:"Russula virescens", com:"Green Quilt Russula", fam:"Russulaceae", desc:"Distinctive cracked green cap — like a mosaic. Mild and delicious.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Russula aeruginea", com:"Tacky Green Russula", fam:"Russulaceae", desc:"Dull green cap with a tacky surface. Mild taste, common under birch.", edi:"Edible", ediClass:"edible"},
+
+  // --- PLEUROTUS ---
+  {sci:"Pleurotus ostreatus", com:"Oyster Mushroom", fam:"Pleurotaceae", desc:"Fan-shaped grey-blue caps growing in shelves on dead wood. Common cultivated.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Pleurotus eryngii", com:"King Oyster Mushroom", fam:"Pleurotaceae", desc:"Thick meaty stem with a small cap. Grows on the roots of Eryngium plants.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Pleurotus pulmonarius", com:"Pale Oyster / Phoenix Mushroom", fam:"Pleurotaceae", desc:"Pale, delicate oyster mushroom. Summer-fruiting, often on hardwoods.", edi:"Edible &mdash; Good", ediClass:"good"},
+
+  // --- PSILOCYBE ---
+  {sci:"Psilocybe cubensis", com:"Golden Teacher / Magic Mushroom", fam:"Hymenogastraceae", desc:"Golden cap that bruises blue. Contains psilocybin.", edi:"Psychoactive", ediClass:"psychoactive"},
+  {sci:"Psilocybe semilanceata", com:"Liberty Cap", fam:"Hymenogastraceae", desc:"Small pointed cap with a sharp nipple. Grows in grasslands and pastures.", edi:"Psychoactive", ediClass:"psychoactive"},
+  {sci:"Psilocybe cyanescens", com:"Wavy Cap", fam:"Hymenogastraceae", desc:"Wavy brown cap with a strongly blue-staining stem. Wood-chip beds.", edi:"Psychoactive", ediClass:"psychoactive"},
+
+  // --- COPRINUS ---
+  {sci:"Coprinus comatus", com:"Shaggy Ink Cap / Lawyer's Wig", fam:"Agaricaceae", desc:"Tall white scaly cap that digests itself into black ink. Eat when young.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Coprinellus micaceus", com:"Glistening Ink Cap", fam:"Psathyrellaceae", desc:"Small clustered caps with mica-like particles. Deliquesces to ink.", edi:"Edible (young)", ediClass:"edible"},
+  {sci:"Coprinopsis atramentaria", com:"Common Ink Cap / Tippler's Bane", fam:"Psathyrellaceae", desc:"Grey-brown ink cap. Contains coprine — toxic with alcohol.", edi:"Poisonous (with alcohol)", ediClass:"poisonous"},
+
+  // --- MACROLEPIOTA ---
+  {sci:"Macrolepiota procera", com:"Parasol Mushroom", fam:"Agaricaceae", desc:"Tall, elegant mushroom with a distinctive snakeskin pattern on the stem.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Chlorophyllum rhacodes", com:"Shaggy Parasol", fam:"Agaricaceae", desc:"Shorter than the parasol, stains orange when cut or bruised.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Lepiota cristata", com:"Stinking Dapperling", fam:"Agaricaceae", desc:"Small white mushroom with reddish scales. Foul coal-tar smell.", edi:"Poisonous", ediClass:"poisonous"},
+
+  // --- HYDNUM / HERICIUM ---
+  {sci:"Hydnum repandum", com:"Hedgehog Mushroom", fam:"Hydnaceae", desc:"Creamy cap with tooth-like spines underneath instead of gills.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Hydnum rufescens", com:"Terracotta Hedgehog", fam:"Hydnaceae", desc:"Reddish-orange hedgehog, smaller and more colourful than H. repandum.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Hericium erinaceus", com:"Lion's Mane / Bearded Tooth", fam:"Hericiaceae", desc:"White cascading spines — resembles a lion's mane. Tastes like seafood.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Hericium coralloides", com:"Coral Tooth Fungus", fam:"Hericiaceae", desc:"Beautiful branched coral-like spines that hang downwards.", edi:"Edible &mdash; Good", ediClass:"good"},
+
+  // --- GANODERMA / TRAMETES ---
+  {sci:"Ganoderma lucidum", com:"Reishi / Lingzhi", fam:"Ganodermataceae", desc:"Red-brown lacquered shelf fungus. Revered in Eastern medicine for centuries.", edi:"Medicinal", ediClass:"medicinal"},
+  {sci:"Ganoderma applanatum", com:"Artist's Bracket", fam:"Ganodermataceae", desc:"Large grey-brown bracket. Pore surface browns when scratched — used for art.", edi:"Inedible", ediClass:"inedible"},
+  {sci:"Trametes versicolor", com:"Turkey Tail", fam:"Polyporaceae", desc:"Beautiful colourful banded shelves. Popular medicinal mushroom (PSK).", edi:"Medicinal", ediClass:"medicinal"},
+
+  // --- LYCOPERDON / CALVATIA ---
+  {sci:"Lycoperdon perlatum", com:"Common Puffball", fam:"Agaricaceae", desc:"Pear-shaped with spiny warts. Releases a cloud of spores when mature.", edi:"Edible (young)", ediClass:"edible"},
+  {sci:"Lycoperdon pyriforme", com:"Stump Puffball", fam:"Agaricaceae", desc:"Pear-shaped puffball that grows in dense clusters on rotting wood.", edi:"Edible (young)", ediClass:"edible"},
+  {sci:"Calvatia gigantea", com:"Giant Puffball", fam:"Agaricaceae", desc:"Huge smooth white ball. Can grow up to 1 metre in diameter!", edi:"Edible &mdash; Good", ediClass:"good"},
+
+  // --- POLYPORES ---
+  {sci:"Fomes fomentarius", com:"Hoof Fungus / Tinder Bracket", fam:"Polyporaceae", desc:"Hoof-shaped grey bracket. Used for millennia to make tinder/amadou.", edi:"Medicinal", ediClass:"medicinal"},
+  {sci:"Laetiporus sulphureus", com:"Chicken of the Woods", fam:"Fomitopsidaceae", desc:"Bright orange-yellow shelves. Tastes remarkably like chicken when cooked.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Grifola frondosa", com:"Hen of the Woods / Maitake", fam:"Meripilaceae", desc:"Large grey-brown clustered polypore at tree bases. Full of flavour.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Cerioporus squamosus", com:"Dryad's Saddle", fam:"Polyporaceae", desc:"Large fan-shaped bracket with dark scales. Watermelon-rind smell.", edi:"Edible (young)", ediClass:"edible"},
+  {sci:"Piptoporus betulinus", com:"Birch Polypore / Razor Strop", fam:"Fomitopsidaceae", desc:"Grey-brown bracket, grows exclusively on birch. Used as a strop for razors.", edi:"Medicinal", ediClass:"medicinal"},
+
+  // --- SUILLUS ---
+  {sci:"Suillus luteus", com:"Slippery Jack", fam:"Suillaceae", desc:"Brown slimy cap with a prominent ring. Remove the slimy skin before eating.", edi:"Edible (remove skin)", ediClass:"edible"},
+  {sci:"Suillus granulatus", com:"Granulated Bolete / Weeping Bolete", fam:"Suillaceae", desc:"No ring, but granular dotted stem. Grows under pines.", edi:"Edible", ediClass:"edible"},
+  {sci:"Suillus bovinus", com:"Cow Bolete", fam:"Suillaceae", desc:"Pale buff cap with large angular pores. Often grows with Gomphidius roseus.", edi:"Edible", ediClass:"edible"},
+
+  // --- LECCINUM ---
+  {sci:"Leccinum aurantiacum", com:"Red-capped Scaber Stalk", fam:"Boletaceae", desc:"Bright orange-red cap with blackening scabers on the stem.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Leccinum scabrum", com:"Birch Bolete", fam:"Boletaceae", desc:"Brown cap with dark scabers on a white stem. Almost always with birch.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Leccinum versipelle", com:"Orange Birch Bolete", fam:"Boletaceae", desc:"Bright orange cap on a scabrous stalk. Flesh blackens when cooked.", edi:"Edible &mdash; Good", ediClass:"good"},
+
+  // --- CORTINARIUS ---
+  {sci:"Cortinarius violaceus", com:"Violet Webcap", fam:"Cortinariaceae", desc:"Striking deep violet mushroom with a dry, fibrillose cap.", edi:"Edible", ediClass:"edible"},
+  {sci:"Cortinarius caperatus", com:"Gypsy Mushroom", fam:"Cortinariaceae", desc:"Wrinkled yellowish cap with a mealy smell. Grows in mossy conifer woods.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Cortinarius rubellus", com:"Deadly Webcap", fam:"Cortinariaceae", desc:"Deadly poisonous tawny-orange webcap. Causes delayed kidney failure.", edi:"Deadly Poisonous", ediClass:"deadly"},
+  {sci:"Cortinarius orellanus", com:"Fool's Webcap", fam:"Cortinariaceae", desc:"Orange-brown webcap with deadly orellanine toxin. Delayed kidney poisoning.", edi:"Deadly Poisonous", ediClass:"deadly"},
+
+  // --- MYCENA / MARASMIUS ---
+  {sci:"Mycena epipterygia", com:"Yellowleg Bonnet", fam:"Mycenaceae", desc:"Grey-brown cap on a bright yellow, sticky stem. Delicate and elegant.", edi:"Inedible", ediClass:"inedible"},
+  {sci:"Mycena chlorophos", com:"Pixie's Parasol", fam:"Mycenaceae", desc:"A bioluminescent mushroom that glows green at night. Found in Asia/Pacific.", edi:"Inedible", ediClass:"inedible"},
+  {sci:"Marasmius oreades", com:"Fairy Ring Champignon", fam:"Marasmiaceae", desc:"Tan cap with pale gills. Grows in fairy rings on lawns. Dries well.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Mycena haematopus", com:"Bleeding Fairy Helmet", fam:"Mycenaceae", desc:"Exudes a blood-red latex when the stem is cut. Grows on decaying wood.", edi:"Inedible", ediClass:"inedible"},
+
+  // --- PHALLUS / CLATHRUS ---
+  {sci:"Phallus impudicus", com:"Common Stinkhorn", fam:"Phallaceae", desc:"Phallic shape with a foul-smelling green spore mass. Attracts flies.", edi:"Edible (egg stage)", ediClass:"edible"},
+  {sci:"Clathrus ruber", com:"Red Cage / Lattice Stinkhorn", fam:"Phallaceae", desc:"Striking red lattice structure like an enclosed cage. Foul-smelling gleba.", edi:"Inedible", ediClass:"inedible"},
+  {sci:"Mutinus caninus", com:"Dog Stinkhorn", fam:"Phallaceae", desc:"Slender, pinkish-orange, resembling a dog's penis. Foul odour.", edi:"Inedible", ediClass:"inedible"},
+
+  // --- TUBER (TRUFFLES) ---
+  {sci:"Tuber melanosporum", com:"Black Périgord Truffle", fam:"Tuberaceae", desc:"The precious black truffle with a prized aromatic flavour. From France.", edi:"Luxury Edible ★", ediClass:"luxury"},
+  {sci:"Tuber magnatum", com:"White Piedmont Truffle", fam:"Tuberaceae", desc:"The most expensive truffle in the world. From Piedmont, Italy.", edi:"Luxury Edible ★", ediClass:"luxury"},
+  {sci:"Tuber aestivum", com:"Summer Truffle", fam:"Tuberaceae", desc:"A dark warted truffle with a pleasant but milder aroma.", edi:"Edible &mdash; Good", ediClass:"good"},
+
+  // --- TRICHOLOMA / CLITOCYBE ---
+  {sci:"Calocybe gambosa", com:"St. George's Mushroom", fam:"Lyophyllaceae", desc:"Cream cap with a strong mealy smell. Fruits around St. George's Day.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Clitocybe nuda", com:"Wood Blewit", fam:"Tricholomataceae", desc:"Beautiful violet-lilac cap. Grows on woodland leaf litter.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Clitocybe odora", com:"Aniseed Toadstool", fam:"Tricholomataceae", desc:"Blue-green cap with a powerful aniseed smell.", edi:"Edible", ediClass:"edible"},
+  {sci:"Entoloma sinuatum", com:"Livid Pinkgill", fam:"Entolomataceae", desc:"Large, pale cap with salmon-pink gills. Severe gastric poisoning.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Flammulina velutipes", com:"Velvet Shank / Enoki", fam:"Physalacriaceae", desc:"Orange cap with a dark velvety stem. Fruits in winter — delicious.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Hygrophorus russula", com:"Pinkish Waxcap", fam:"Hygrophoraceae", desc:"Pinkish-red cap with spots. Thick waxy gills. Under hardwoods.", edi:"Edible", ediClass:"edible"},
+  {sci:"Tricholoma matsutake", com:"Matsutake / Pine Mushroom", fam:"Tricholomataceae", desc:"Highly aromatic pine mushroom, deeply prized in Japanese cuisine.", edi:"Luxury Edible ★", ediClass:"luxury"},
+  {sci:"Tricholoma equestre", com:"Yellow Knight", fam:"Tricholomataceae", desc:"Greenish-yellow cap. Once considered edible, now known to cause muscle damage.", edi:"Poisonous (avoid!)", ediClass:"poisonous"},
+
+  // --- HYPHOLOMA / STROPHARIA ---
+  {sci:"Hypholoma fasciculare", com:"Sulphur Tuft", fam:"Strophariaceae", desc:"Bright yellow clustered mushrooms with green gills. Extremely bitter.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Hypholoma lateritium", com:"Brick Tuft", fam:"Strophariaceae", desc:"Brick-red clustered caps with grey-purple gills.", edi:"Edible (cooked)", ediClass:"edible"},
+  {sci:"Stropharia aeruginosa", com:"Verdigris Roundhead", fam:"Strophariaceae", desc:"Beautiful blue-green slimy cap with white patches. A stunning sight.", edi:"Edible (cooked)", ediClass:"edible"},
+
+  // --- MISCELLANEOUS ---
+  {sci:"Auricularia auricula-judae", com:"Jelly Ear / Wood Ear", fam:"Auriculariaceae", desc:"Brown, ear-shaped jelly fungus on elder and other wood. Popular in Asian cuisine.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Tremella mesenterica", com:"Yellow Brain / Golden Jelly", fam:"Tremellaceae", desc:"Yellow, brain-like gelatinous lobes. Common on dead branches.", edi:"Edible", ediClass:"edible"},
+  {sci:"Paxillus involutus", com:"Brown Roll-rim", fam:"Paxillaceae", desc:"Brown cap with a distinctively inrolled margin. Poisonous!", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Pholiota squarrosa", com:"Shaggy Pholiota", fam:"Strophariaceae", desc:"Yellow-brown with red-brown scales. Grows in dense clusters at tree bases.", edi:"Edible (cooked)", ediClass:"edible"},
+  {sci:"Pluteus cervinus", com:"Deer Shield / Fawn Mushroom", fam:"Pluteaceae", desc:"Brown cap with pink gills. Grows on rotting wood.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Sparassis crispa", com:"Cauliflower Fungus", fam:"Sparassidaceae", desc:"Large cream-coloured clustered lobes. Looks like a cauliflower or brain.", edi:"Edible &mdash; Choice ★", ediClass:"choice"},
+  {sci:"Gyromitra esculenta", com:"False Morel", fam:"Discinaceae", desc:"Brain-like convoluted cap. Deadly toxic when raw — toxic even when cooked.", edi:"Toxic — avoid!", ediClass:"toxic"},
+  {sci:"Helvella lacunosa", com:"Elfin Saddle", fam:"Helvellaceae", desc:"Grey three-lobed cap on a deeply fluted stem. Unusual and elegant.", edi:"Edible (cooked)", ediClass:"edible"},
+  {sci:"Inocybe lacera", com:"Burned-ground Fibrecap", fam:"Inocybaceae", desc:"Brown fibrous cap on disturbed ground. Contains dangerous muscarine.", edi:"Poisonous", ediClass:"poisonous"},
+  {sci:"Volvariella volvacea", com:"Paddy Straw Mushroom", fam:"Pluteaceae", desc:"Cultivated widely in Asia. Wrapped in a distinctive volva.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Xerocomellus chrysenteron", com:"Red Cracking Bolete", fam:"Boletaceae", desc:"Brown cap that cracks to reveal red flesh underneath. Yellow pores.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Tylopilus felleus", com:"Bitter Bolete", fam:"Boletaceae", desc:"Brown cap with pink pores. Extremely bitter — can ruin a dish.", edi:"Inedible (bitter)", ediClass:"inedible"},
+  {sci:"Ramaria botrytis", com:"Red-tipped Coral", fam:"Gomphaceae", desc:"Pinkish branches with red tips. A beautiful coral fungus.", edi:"Edible &mdash; Good", ediClass:"good"},
+  {sci:"Clavaria zollingeri", com:"Violet Coral", fam:"Clavariaceae", desc:"Amethyst-violet branching coral. Stunning colour.", edi:"Edible", ediClass:"edible"},
+  {sci:"Clavulina coralloides", com:"Crested Coral", fam:"Clavulinaceae", desc:"White branching coral with crested tips. Grows on leaf litter.", edi:"Edible", ediClass:"edible"},
+  {sci:"Exidia glandulosa", com:"Black Witches' Butter", fam:"Exidiaceae", desc:"Black gelatinous blobs on dead branches. Becomes hard when dry.", edi:"Inedible", ediClass:"inedible"},
+  {sci:"Otidea onotica", com:"Hare's Ear", fam:"Pyronemataceae", desc:"Ear-shaped yellow-brown cup fungus. Grows in mossy woods.", edi:"Edible", ediClass:"edible"},
+];
+
+// ===== FUNCTIONS =====
+let currentFilter = 'all';
+let currentSearch = '';
+const imageCache = {};
+
+function getEdibilityClass(cls) {
+  const map = {
+    'edible':'edibility-edible','choice':'edibility-choice','good':'edibility-good',
+    'poisonous':'edibility-poisonous','deadly':'edibility-deadly',
+    'psychoactive':'edibility-psychoactive','medicinal':'edibility-medicinal',
+    'inedible':'edibility-inedible','toxic':'edibility-toxic','luxury':'edibility-luxury'
+  };
+  return map[cls] || 'edibility-edible';
+}
+
+function makeWikiSlug(name) {
+  // Convert scientific name to Wikipedia URL slug
+  // Handle special cases with known Wikipedia page names
+  const overrides = {
+    'Imleria badia': 'Boletus_badius',
+    'Chlorophyllum rhacodes': 'Chlorophyllum_rhacodes',
+    'Cerioporus squamosus': 'Cerioporus_squamosus',
+    'Xerocomellus chrysenteron': 'Xerocomellus_chrysenteron',
+  };
+  return overrides[name] || name.replace(/ /g, '_');
+}
+
+// Load images from Wikipedia REST API
+async function loadImage(mushroom) {
+  const slug = makeWikiSlug(mushroom.sci);
+  if (imageCache[slug]) return imageCache[slug];
+  
+  try {
+    const resp = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(slug)}`);
+    const data = await resp.json();
+    if (data.thumbnail && data.thumbnail.source) {
+      const imgUrl = data.thumbnail.source;
+      const articleUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(slug)}`;
+      imageCache[slug] = { img: imgUrl, article: articleUrl };
+      return imageCache[slug];
+    }
+  } catch(e) {}
+  return null;
+}
+
+async function renderAllCards() {
+  const grid = document.getElementById('mushroomGrid');
+  document.getElementById('speciesCount').textContent = `${mushrooms.length} species`;
+  
+  // Build card HTML with loading placeholder
+  grid.innerHTML = mushrooms.map((m, i) => `
+    <div class="card" data-index="${i}">
+      <div class="card-img-wrapper" data-sci="${m.sci}">
+        <div class="img-loading"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-sci-name"><em>${m.sci}</em></div>
+        <div class="card-common-name">${m.com}</div>
+        <span class="card-family">${m.fam}</span>
+        <div class="card-desc">${m.desc}</div>
+        <span class="card-edibility ${getEdibilityClass(m.ediClass)}">${m.edi}</span>
+      </div>
+    </div>
+  `).join('');
+  
+  // Load images asynchronously (in batches to avoid overwhelming API)
+  const batchSize = 6;
+  for (let i = 0; i < mushrooms.length; i += batchSize) {
+    const batch = mushrooms.slice(i, i + batchSize);
+    await Promise.all(batch.map(async (m) => {
+      const info = await loadImage(m);
+      if (info) {
+        const wrapper = grid.querySelector(`[data-sci="${m.sci}"]`);
+        if (wrapper) {
+          wrapper.innerHTML = `
+            <a href="${info.article}" target="_blank" rel="noopener" title="View on Wikipedia — image attribution">
+              <img src="${info.img}" alt="${m.sci}" loading="lazy">
+            </a>
+            <div class="attribution">
+              <a href="${info.article}" target="_blank" rel="noopener">📷 View source & attribution</a>
+            </div>
+          `;
+        }
+      } else {
+        // Fallback: link to Wikipedia search for this species
+        const slug = makeWikiSlug(m.sci);
+        const wikiUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(slug)}`;
+        const wrapper = grid.querySelector(`[data-sci="${m.sci}"]`);
+        if (wrapper) {
+          wrapper.innerHTML = `
+            <a href="${wikiUrl}" target="_blank" rel="noopener" title="View on Wikipedia">
+              <div class="img-loading" style="background: linear-gradient(135deg, #1a1410 30%, #2d2620 100%);">
+                <span style="font-size:48px;opacity:0.4;">🍄</span>
+              </div>
+            </a>
+            <div class="attribution">
+              <a href="${wikiUrl}" target="_blank" rel="noopener">📖 View on Wikipedia</a>
+            </div>
+          `;
+        }
+      }
+    }));
+    
+    // Brief pause between batches to be kind to the API
+    if (i + batchSize < mushrooms.length) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+}
+
+function filterCards() {
+  currentSearch = document.getElementById('searchInput').value.toLowerCase().trim();
+  
+  const filtered = mushrooms.filter(m => {
+    const matchesSearch = !currentSearch ||
+      m.sci.toLowerCase().includes(currentSearch) ||
+      m.com.toLowerCase().includes(currentSearch) ||
+      m.fam.toLowerCase().includes(currentSearch) ||
+      m.desc.toLowerCase().includes(currentSearch);
+    const matchesFilter = currentFilter === 'all' || m.ediClass === currentFilter;
+    return matchesSearch && matchesFilter;
+  });
+  
+  // Apply visibility
+  document.querySelectorAll('.card').forEach((card, i) => {
+    const data = mushrooms[i];
+    const matchesSearch = !currentSearch ||
+      data.sci.toLowerCase().includes(currentSearch) ||
+      data.com.toLowerCase().includes(currentSearch) ||
+      data.fam.toLowerCase().includes(currentSearch) ||
+      data.desc.toLowerCase().includes(currentSearch);
+    const matchesFilter = currentFilter === 'all' || data.ediClass === currentFilter;
+    card.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+  });
+  
+  document.getElementById('noResults').classList.toggle('show', filtered.length === 0);
+  document.getElementById('speciesCount').textContent = `${filtered.length} of ${mushrooms.length} species`;
+}
+
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  filterCards();
+}
+
+// Init
+renderAllCards();
+</script>
+</body>
+</html>
