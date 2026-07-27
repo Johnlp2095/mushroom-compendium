@@ -1,2 +1,2 @@
 # mushroom-compendium
-Compendium of Muchrooms
+Compendium of Mushrooms
